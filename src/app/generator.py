@@ -5,7 +5,7 @@ from langchain_core.documents import Document
 from app.config import CHAT_MODEL, COHERE_API_KEY
 
 SYSTEM_PROMPT = (
-    "Eres un asistente interno de una empresa de tecnología especializada en "
+    "Eres un asistente interno de Santo Pegasus Soluciones, empresa especializada en "
     "desarrollo de software escalable bajo arquitectura de microservicios e "
     "Inteligencia Artificial. Respondes preguntas de los colaboradores "
     "basándote EXCLUSIVAMENTE en los documentos internos proporcionados.\n\n"
@@ -20,21 +20,22 @@ SYSTEM_PROMPT = (
 
 FALLBACK = "No encontré información sobre eso en los documentos disponibles."
 
-
 def build_context(results: list[tuple[Document, float]]) -> str:
     parts: list[str] = []
 
     for doc, score in results:
         file_name = doc.metadata.get("file_name", "Desconocido")
+        category = doc.metadata.get("category", "General")
+        department = doc.metadata.get("department", "Desconocido")
         page = doc.metadata.get("page", "?")
 
         parts.append(
-            f"[Fuente: {file_name} — Página {page} | Relevancia: {score:.2f}]\n"
+            f"[Fuente: {file_name} | {category} — {department} | "
+            f"Página {page} | Relevancia: {score:.2f}]\n"
             f"{doc.page_content}"
         )
 
     return "\n\n---\n\n".join(parts)
-
 
 def generate(
     query: str,
@@ -75,18 +76,22 @@ def generate(
 
     return {"answer": answer, "sources": sources}
 
-
 def _format_sources(results: list[tuple[Document, float]]) -> str:
     seen: set[str] = set()
     lines: list[str] = []
 
     for doc, score in results:
         file_name = doc.metadata.get("file_name", "Desconocido")
+        category = doc.metadata.get("category", "General")
+        department = doc.metadata.get("department", "Desconocido")
         page = doc.metadata.get("page", "?")
         key = f"{file_name}-{page}"
 
         if key not in seen:
             seen.add(key)
-            lines.append(f"• {file_name} — Página {page} (relevancia: {score:.2f})")
+            lines.append(
+                f"• {file_name} — {category} | {department} "
+                f"| Página {page} (relevancia: {score:.2f})"
+            )
 
     return "\n".join(lines)
