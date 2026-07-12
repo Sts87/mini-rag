@@ -1,6 +1,5 @@
 import json
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from langchain_core.documents import Document
@@ -20,13 +19,15 @@ def log_interaction(
 
     Each line is a self-contained JSON object with:
     - timestamp, query, answer, response_time_ms
-    - retrieved documents (file_name, page, score)
+    - retrieved documents (file_name, category, department, page, score)
     """
     _LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     sources = [
         {
             "file_name": doc.metadata.get("file_name", "unknown"),
+            "category": doc.metadata.get("category", "General"),
+            "department": doc.metadata.get("department", "Desconocido"),
             "page": doc.metadata.get("page", "?"),
             "score": round(score, 4),
         }
@@ -34,7 +35,7 @@ def log_interaction(
     ]
 
     record = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "query": query,
         "answer": answer,
         "response_time_ms": round(elapsed_seconds * 1000),
