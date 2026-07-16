@@ -4,3 +4,4 @@ src/data/vectorstore/
 src/data/logs/
 __pycache__/
 *.pyc
+*.tfvars
