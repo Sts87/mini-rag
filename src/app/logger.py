@@ -4,7 +4,7 @@ from pathlib import Path
 
 from langchain_core.documents import Document
 
-_LOG_DIR = Path(__file__).parent.parent / "data" / "logs"
+_LOG_DIR = Path(__file__).parent.parent.parent / "data" / "logs"
 _LOG_FILE = _LOG_DIR / "interactions.jsonl"
 
 

@@ -1,0 +1,48 @@
+services:
+  mini-rag:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: mini-rag:latest
+    container_name: mini-rag
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - vectorstore:/app/data/vectorstore
+      - logs:/app/data/logs
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urlib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  build-index:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: mini-rag:latest
+    container_name: mini-rag-build-index
+    env_file:
+      - .env
+    volumes:
+      - ./data/documents:/app/data/documents:ro
+      - vectorstore:/app/data/vectorstore
+    command: ["python", "src/scripts/build_index.py"]
+    profiles:
+      - tools
+
+volumes:
+  vectorstore:
+  logs:
