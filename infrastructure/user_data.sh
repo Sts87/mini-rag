@@ -1,13 +1,23 @@
 #!/bin/bash
 set -euo pipefail
 
+fallocate -l 4G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' | tee -a /etc/fstab
+
+echo 'vm.swappiness=10' | tee -a /etc/sysctl.conf
+sysctl -p
+
 dnf update -y
 
 dnf install -y podman podman-compose
 
-loginctl enable-linger opc
-
 systemctl enable --now podman.socket || true
+
+until id opc &>/dev/null; do sleep 2; done
+loginctl enable-linger opc
 
 mkdir -p /opt/mini-rag/data/documents
 mkdir -p /opt/mini-rag/data/vectorstore
