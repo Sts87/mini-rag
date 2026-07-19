@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Build image
         run: docker build -t mini-rag:latest .
 
@@ -32,6 +32,15 @@ jobs:
           key: ${{ secrets.VM_KEY }}
           source: "mini-rag.tar,compose.yml"
           target: "/opt/mini-rag"
+
+      - name: Create .env on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          script: |
+            echo "COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}" > /opt/mini-rag/.env
 
       - name: Deploy on VM
         uses: appleboy/ssh-action@v1.0.3
