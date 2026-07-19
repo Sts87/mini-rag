@@ -12,7 +12,9 @@ sysctl -p
 
 dnf update -y
 
-dnf install -y podman podman-compose
+dnf install -y podman python3.11 python3.11-pip
+
+pip3.11 -m pip install podman-compose
 
 systemctl enable --now podman.socket || true
 
