@@ -1,4 +1,4 @@
-FROM python:3.14-slim AS builder
+FROM python:3.12-slim AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
@@ -9,9 +9,10 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project --no-dev
 
 
-FROM python:3.14-slim AS runtime
+FROM python:3.12-slim AS runtime
 
-RUN groupadd --gid 1001 appgroup && useradd --uid 1001 --gid appgroup --shell /bin/bash --create-home appuser
+RUN groupadd --gid 1001 appgroup && \
+    useradd --uid 1001 --gid appgroup --shell /bin/bash --create-home appuser
 
 WORKDIR /app
 
@@ -20,7 +21,7 @@ COPY --from=builder /app/.venv /app/.venv
 COPY src/ ./src/
 
 ENV PATH="/app/.venv/bin:$PATH" \
-    PYTHONBUFFERED=1 \
+    PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH="/app/src"
 

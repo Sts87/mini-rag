@@ -1,4 +1,4 @@
-.PHONY: build run stop logs index tag push pull run
+.PHONY: build run stop logs index tag push pull-run
 
 REGISTRY   ?= <region>.ocir.io
 NAMESPACE  ?= <tenancy-namespace>
@@ -6,7 +6,7 @@ IMAGE_NAME ?= mini-rag
 IMAGE_TAG  ?= latest
 FULL_IMAGE  = $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
 
-DOCKER := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
+DOCKER  := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)
 COMPOSE := $(DOCKER) compose
 
 build:
