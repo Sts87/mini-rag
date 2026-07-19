@@ -1,9 +1,5 @@
 services:
   mini-rag:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runtime
     image: mini-rag:latest
     container_name: mini-rag
     ports:
@@ -11,8 +7,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data/vectorstore:/app/data/vectorstore:z
-      - ./data/logs:/app/data/logs:z
+      - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z
+      - /opt/mini-rag/data/logs:/app/data/logs:z
     restart: unless-stopped
     healthcheck:
       test:
@@ -26,15 +22,11 @@ services:
       start_period: 15s
 
   build-index:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: runtime
     image: mini-rag:latest
     container_name: mini-rag-build-index
     env_file:
       - .env
     volumes:
-      - ./data/documents:/app/data/documents:ro,z
-      - ./data/vectorstore:/app/data/vectorstore:z
+      - /opt/mini-rag/data/documents:/app/data/documents:ro,z
+      - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z
     command: ["python", "src/scripts/build_index.py"]
