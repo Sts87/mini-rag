@@ -11,7 +11,7 @@ EMBEDDING_MODEL: str = "embed-multilingual-v3.0"
 CHAT_MODEL: str = "command-r-plus-08-2024"
 EMBEDDING_DIM: int = 1024
 
-_ROOT = Path(__file__).parent.parent  # src/
+_ROOT = Path(__file__).parent.parent.parent  # src/
 DATA_DIR = _ROOT / "data"
 DOCUMENTS_DIR = DATA_DIR / "documents"
 VECTORSTORE_DIR = DATA_DIR / "vectorstore"

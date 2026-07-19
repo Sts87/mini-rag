@@ -1,6 +1,20 @@
-.venv/
+# Secrets
 .env
-src/data/vectorstore/
-src/data/logs/
+
+# Data
+data/vectorstore/
+data/logs/
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+.venv/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.backup
+.terraform/
