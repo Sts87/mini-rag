@@ -1,0 +1,46 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv run ruff check src/
+
+  deploy:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build image
+        run: docker build -t mini-rag:latest .
+
+      - name: Save image
+        run: docker save mini-rag:latest -o mini-rag.tar
+
+      - name: Copy to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          source: "mini-rag.tar,compose.yml"
+          target: "/opt/mini-rag"
+
+      - name: Deploy on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          script: |
+            cd /opt/mini-rag
+            podman load -i mini-rag.tar
+            podman-compose -f compose.yml up -d --remove-orphans
+            podman-compose -f compose.yml logs --tail=20 mini-rag
