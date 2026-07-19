@@ -42,7 +42,7 @@ resource "oci_core_security_list" "security_list" {
 
     ingress_security_rules {
         protocol = "6" 
-        source = "192.168.1.0/24"
+        source = "0.0.0.0/0"
         source_type = "CIDR_BLOCK"
         tcp_options {
             min = 22
