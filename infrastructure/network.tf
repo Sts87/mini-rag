@@ -66,6 +66,7 @@ resource "oci_core_subnet" "public_subnet" {
     vcn_id = oci_core_vcn.vcn.id
 
     display_name = "Public Subnet"
+    cidr_block = var.public_subnet_cidr_block
     dns_label = var.public_subnet_dns_label
     route_table_id = oci_core_route_table.public_route_table.id
     security_list_ids = [oci_core_security_list.security_list.id]

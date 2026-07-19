@@ -22,6 +22,10 @@ variable "public_subnet_dns_label" {
     type = string
 }
 
+variable "public_subnet_cidr_block" {
+    type = string
+}
+
 variable "instance_shape" {
     type = string
     default = "VM.Standard.E2.1.Micro"

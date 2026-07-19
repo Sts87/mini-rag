@@ -8,11 +8,6 @@ output "vm_ssh_command" {
   value       = "ssh opc@${oci_core_instance.mini_rag_worker.public_ip}"
 }
 
-output "ocir_repository" {
-  description = "URL del repositorio OCIR"
-  value       = "scl.ocir.io/${var.tenancy_ocid}/mini-rag-repo"
-}
-
 output "app_url" {
   description = "URL de la aplicación"
   value       = "http://${oci_core_instance.mini_rag_worker.public_ip}:8501"
