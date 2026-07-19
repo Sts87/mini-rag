@@ -1,0 +1,27 @@
+# Version control
+.git
+.gitignore
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Data 
+data/vectorstore/
+data/logs/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+.venv/
+
+# Infrastructure
+infrastructure/
+
+# Docs y miscelánea
+README.md
+Makefile
