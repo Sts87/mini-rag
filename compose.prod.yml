@@ -1,4 +1,14 @@
 services:
+  build-index:
+      image: mini-rag:latest
+      container_name: mini-rag-build-index
+      env_file:
+        - .env
+      volumes:
+        - /opt/mini-rag/data/documents:/app/data/documents:ro,z,U
+        - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z,U
+      command: ["python", "src/scripts/build_index.py"]
+
   mini-rag:
     image: mini-rag:latest
     container_name: mini-rag
@@ -10,8 +20,8 @@ services:
       build-index:
         condition: service_completed_successfully
     volumes:
-      - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z
-      - /opt/mini-rag/data/logs:/app/data/logs:z
+      - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z,U
+      - /opt/mini-rag/data/logs:/app/data/logs:z,U
     restart: unless-stopped
     healthcheck:
       test:
@@ -23,13 +33,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
-
-  build-index:
-    image: mini-rag:latest
-    container_name: mini-rag-build-index
-    env_file:
-      - .env
-    volumes:
-      - /opt/mini-rag/data/documents:/app/data/documents:ro,z
-      - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z
-    command: ["python", "src/scripts/build_index.py"]
