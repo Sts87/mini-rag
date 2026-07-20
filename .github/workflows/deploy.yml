@@ -55,3 +55,15 @@ jobs:
             /usr/local/bin/podman-compose -f compose.yml down
             /usr/local/bin/podman-compose -f compose.yml up -d --remove-orphans
             /usr/local/bin/podman-compose -f compose.yml logs --tail=20 mini-rag
+
+      - name: Healthcheck
+        run: |
+          echo "Waiting for app to start..."
+          sleep 15
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.VM_HOST }}:8501/_stcore/health)
+          if [ "$STATUS" = "200" ]; then
+            echo "✓ App is healthy (HTTP $STATUS)"
+          else
+            echo "✗ App healthcheck failed (HTTP $STATUS)"
+            exit 1
+          fi
