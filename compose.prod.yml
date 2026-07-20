@@ -6,6 +6,9 @@ services:
       - "8501:8501"
     env_file:
       - .env
+    depends_on:
+      build-index:
+        condition: service_completed_successfully
     volumes:
       - /opt/mini-rag/data/vectorstore:/app/data/vectorstore:z
       - /opt/mini-rag/data/logs:/app/data/logs:z
