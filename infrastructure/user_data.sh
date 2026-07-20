@@ -14,7 +14,9 @@ dnf update -y
 
 dnf install -y podman python3.11 python3.11-pip
 
-pip3.11 -m pip install podman-compose
+python3.11 -m pip install podman-compose
+
+echo 'export PATH=$PATH:/usr/local/bin' >> /home/opc/.bashrc
 
 systemctl enable --now podman.socket || true
 
