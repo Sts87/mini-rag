@@ -30,7 +30,7 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_KEY }}
-          source: "mini-rag.tar,compose.yml"
+          source: "mini-rag.tar,compose.prod.yml"
           target: "/opt/mini-rag"
 
       - name: Create .env on VM
@@ -50,6 +50,8 @@ jobs:
           key: ${{ secrets.VM_KEY }}
           script: |
             cd /opt/mini-rag
+            mv compose.prod.yml compose.yml
             podman load -i mini-rag.tar
-            podman-compose -f compose.yml up -d --remove-orphans
-            podman-compose -f compose.yml logs --tail=20 mini-rag
+            /usr/local/bin/podman-compose -f compose.yml down
+            /usr/local/bin/podman-compose -f compose.yml up -d --remove-orphans
+            /usr/local/bin/podman-compose -f compose.yml logs --tail=20 mini-rag
