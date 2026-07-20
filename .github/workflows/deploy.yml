@@ -1,0 +1,69 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv run ruff check src/
+
+  deploy:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t mini-rag:latest .
+
+      - name: Save image
+        run: docker save mini-rag:latest -o mini-rag.tar
+
+      - name: Copy to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          source: "mini-rag.tar,compose.prod.yml"
+          target: "/opt/mini-rag"
+
+      - name: Create .env on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          script: |
+            echo "COHERE_API_KEY=${{ secrets.COHERE_API_KEY }}" > /opt/mini-rag/.env
+
+      - name: Deploy on VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_KEY }}
+          script: |
+            cd /opt/mini-rag
+            mv compose.prod.yml compose.yml
+            podman load -i mini-rag.tar
+            /usr/local/bin/podman-compose -f compose.yml down
+            /usr/local/bin/podman-compose -f compose.yml up -d --remove-orphans
+            /usr/local/bin/podman-compose -f compose.yml logs --tail=20 mini-rag
+
+      - name: Healthcheck
+        run: |
+          echo "Waiting for app to start..."
+          sleep 15
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.VM_HOST }}:8501/_stcore/health)
+          if [ "$STATUS" = "200" ]; then
+            echo "✓ App is healthy (HTTP $STATUS)"
+          else
+            echo "✗ App healthcheck failed (HTTP $STATUS)"
+            exit 1
+          fi
