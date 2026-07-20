@@ -22,7 +22,9 @@ jobs:
         run: docker build -t mini-rag:latest .
 
       - name: Save image
-        run: docker save mini-rag:latest -o mini-rag.tar
+        run: |
+          docker save mini-rag:latest -o mini-rag.tar
+          sudo chmod 644 mini-rag.tar
 
       - name: Copy to VM
         uses: appleboy/scp-action@v0.1.7
