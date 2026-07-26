@@ -18,3 +18,6 @@ __pycache__/
 *.tfvars
 *.tfvars.backup
 .terraform/
+
+# Ansible
+ansible/inventory.yml
