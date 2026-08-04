@@ -19,3 +19,4 @@ VECTORSTORE_DIR = DATA_DIR / "vectorstore"
 CHUNK_SIZE: int = 800
 CHUNK_OVERLAP: int = 150
 RETRIEVAL_TOP_K: int = 5
+

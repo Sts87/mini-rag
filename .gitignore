@@ -2,8 +2,8 @@
 .env
 
 # Data
-data/vectorstore/
-data/logs/
+**/data/vectorstore/
+**/data/logs/
 
 # Python
 __pycache__/
