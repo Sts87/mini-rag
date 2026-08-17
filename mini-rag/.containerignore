@@ -1,0 +1,19 @@
+# Version control
+.git
+.gitignore
+
+# Secrets 
+.env
+.env.*
+
+# Data
+/data/vectorstore/
+/data/logs/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual enviroment
+.venv/
