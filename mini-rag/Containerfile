@@ -1,0 +1,44 @@
+FROM ghcr.io/astral-sh/uv:0.12.5-python3.12-dhi@sha256:e117939a1cd84015a3e65ab377798070462a05b5e8eeb195d24389f83ee1926d AS uv
+
+FROM registry.access.redhat.com/hi/python:3.14.7-builder@sha256:c97487a76b1ec6a672f58a1a53ca69041ca78acbaf3b7b0f562c3b41cd7d0763 AS builder
+
+USER root
+
+COPY --from=uv /usr/local/bin/uv /usr/local/bin/uvx /bin/
+
+WORKDIR /mini-rag
+
+COPY pyproject.toml uv.lock .python-version /mini-rag/
+
+RUN  uv sync --locked --no-install-project --no-dev
+
+COPY data/vectorstore /mini-rag/data/vectorstore/
+
+COPY src/ /mini-rag/src/
+
+RUN uv sync --locked --no-dev
+
+USER ${CONTAINER_DEFAULT_USER}
+
+
+FROM registry.access.redhat.com/hi/python:3.14.7@sha256:144a7e992726c27ffa18158bac295244f8e8df233beb6b1cb5fc162f3b53287b AS runtime
+
+WORKDIR /mini-rag
+
+COPY --from=builder /mini-rag/.venv /mini-rag/.venv/
+
+COPY --from=builder /mini-rag/data/vectorstore /mini-rag/data/vectorstore/
+
+COPY --from=builder /mini-rag/src/app /mini-rag/src/app/
+
+COPY --from=builder /mini-rag/src/streamlit_app.py /mini-rag/src/
+
+ENV PATH="/mini-rag/.venv/bin:$PATH"
+
+EXPOSE 8501
+
+CMD [ "streamlit", "run", "src/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+
+
+
+
