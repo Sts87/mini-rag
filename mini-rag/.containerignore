@@ -7,7 +7,7 @@
 .env.*
 
 # Data
-/data/vectorstore/
+/data/documents/
 /data/logs/
 
 # Python artifacts
