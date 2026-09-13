@@ -33,7 +33,7 @@ st.success(f"✓ Índice cargado — {len(chunks)} chunks de {index.ntotal} vect
 st.divider()
 
 query = st.text_input(
-    "¿Qué querés saber?",
+    "¿Qué deseas saber?",
     placeholder="Ej: ¿Cuál es el proceso de code review?",
 )
 
