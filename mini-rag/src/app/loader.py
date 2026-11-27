@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from langchain_community.document_loaders import PyPDFLoader
+from pypdf import PdfReader
 from langchain_core.documents import Document
 
 _DOCUMENT_CATALOG: dict[str, dict[str, str]] = {
@@ -46,16 +46,24 @@ def load_pdfs(directory: str | Path) -> list[Document]:
         raise FileNotFoundError(f"No PDF files found in: {directory}")
 
     for pdf_path in pdf_files:
-        loader = PyPDFLoader(str(pdf_path))
-        pages = loader.load()
+        reader = PdfReader(str(pdf_path))
+        pages: list[Document] = []
 
         catalog_entry = _DOCUMENT_CATALOG.get(pdf_path.name, {})
 
-        for page in pages:
-            page.metadata["file_name"] = pdf_path.name
-            page.metadata["category"] = catalog_entry.get("category", "General")
-            page.metadata["department"] = catalog_entry.get("department", "Desconocido")
-            page.metadata["version"] = catalog_entry.get("version", "?")
+        for page_num, page in enumerate(reader.pages):
+            pages.append(
+                Document(
+                    page_content= page.extract_text() or "",
+                    metadata ={
+                        "page": page_num + 1,
+                        "file_name": pdf_path.name,
+                        "category": catalog_entry.get("category", "General"),
+                        "department": catalog_entry.get("department", "Desconocido"),
+                        "version": catalog_entry.get("version", "?")
+                    }
+                )
+            )
 
         documents.extend(pages)
         category = catalog_entry.get("category", "General")
