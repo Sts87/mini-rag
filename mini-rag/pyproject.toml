@@ -6,9 +6,10 @@ requires-python = ">=3.12,<3.15"
 dependencies = [
     "cohere>=7.0.5",
     "faiss-cpu>=1.14.3",
-    "langchain-community>=0.4.2",
+    "langchain-core>=1.4.9",
     "langchain-text-splitters>=1.1.2",
-    "pypdf>=6.14.2",
+    "numpy>=2.5.1",
+    "pypdf>=7.2.0",
     "python-dotenv>=1.2.2",
     "streamlit>=1.59.1",
 ]
@@ -22,8 +23,16 @@ packages = ["src/app"]
 
 [dependency-groups]
 dev = [
+    "deptry>=0.25.1",
     "ruff>=0.15.21",
 ]
+
+[tool.deptry]
+known_first_party = ["app"]
+extend_exclude = ["data"]
+
+[tool.deptry.per_rule_ignores]
+DEP003 = ["app"]
 
 [tool.ruff]
 line-length = 88
